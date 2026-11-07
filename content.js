@@ -40,12 +40,12 @@ window.CONTENT = {
     },
     long: {
       it: [
-        "Ho iniziato a lavorare durante l'università e non mi sono più fermato: dal casello autostradale alla grande distribuzione, dalla pianificazione dei trasporti alla guida di un ufficio commerciale. In Sogema sono passato da disponente al traffico a responsabile commerciale in due anni e mezzo; oggi pianifico spedizioni nazionali e internazionali e negozio con vettori su gomma, intermodale e marittimo.",
-        "Sono proattivo, curioso e competitivo, in ufficio come nello sport. Fuori dal lavoro esploro l'intelligenza artificiale: progetto workflow creativi con Midjourney e studio come l'AI sta cambiando il modo di lavorare."
+        "Ho iniziato a lavorare durante l'università e non mi sono più fermato: dal casello autostradale alla grande distribuzione, dalla pianificazione dei trasporti alla guida di un ufficio commerciale. In due anni e mezzo sono passato dal coordinamento dei viaggi alla responsabilità commerciale; oggi pianifico spedizioni verso l'Italia e il resto del mondo e negozio con vettori su gomma e intermodale.",
+        "Sono proattivo, curioso e mi metto in gioco, nel lavoro come nella vita. Sono sportivo da quando ero bambino e ascolto moltissima musica: oltre 22.000 minuti in un anno su Spotify, con l'idea di arrivare prima o poi a farla. Fuori dal lavoro esploro anche l'intelligenza artificiale: progetto workflow creativi con Midjourney e studio come l'AI sta cambiando il modo di lavorare."
       ],
       en: [
-        "I started working while still at university and never stopped: from a motorway toll booth to large-scale retail, from transport planning to leading a sales office. At Sogema I went from traffic coordinator to sales manager in two and a half years; today I plan domestic and international shipments and negotiate with road, intermodal and ocean carriers.",
-        "I'm proactive, curious and competitive, at work as much as in sport. Outside work I explore artificial intelligence: I design creative workflows with Midjourney and study how AI is changing the way we work."
+        "I started working while still at university and never stopped: from a motorway toll booth to large-scale retail, from transport planning to leading a sales office. In two and a half years I went from coordinating loads to heading sales; today I plan shipments across Italy and worldwide and negotiate with road and intermodal carriers.",
+        "I'm proactive and curious, and I like to put myself to the test, at work and in life. I've been into sport since I was a kid and I listen to a huge amount of music: more than 22,000 minutes a year on Spotify, with the hope of making some of my own one day. Outside work I also explore artificial intelligence: I design creative workflows with Midjourney and study how AI is changing the way we work."
       ]
     }
   },
@@ -53,8 +53,8 @@ window.CONTENT = {
   numbers: [
     { value: 16, suffix: "+", it: "anni di esperienza lavorativa", en: "years of work experience" },
     { value: 8,  suffix: "+", it: "anni in trasporti e logistica", en: "years in transport & logistics" },
-    { value: 3,  suffix: "",  it: "ruoli in crescita in Sogema",   en: "progressive roles at Sogema" },
-    { value: 2,  suffix: "",  it: "lingue",                        en: "languages" }
+    { value: 5,  suffix: "",  it: "settori attraversati, dalla grande distribuzione all'industria", en: "sectors, from retail to manufacturing" },
+    { value: 20, suffix: "",  it: "rotte extra UE gestite nei tender marittimi", en: "non-EU routes managed in ocean freight tenders" }
   ],
 
   /* Dal più recente al più vecchio. current: true = ruolo attuale (pallino arancione, barra aperta).
@@ -70,14 +70,16 @@ window.CONTENT = {
       start: "2022-02",
       points: {
         it: [
-          "Pianifico ogni giorno le spedizioni degli ordini di vendita per l'Italia e l'estero, in coordinamento con il back office.",
-          "Coordino e ottimizzo le tariffe dei tender marittimi.",
-          "Negozio con i vettori su gomma e intermodale, gestisco i listini di riferimento e cerco nuovi partner di trasporto."
+          "Pianifico ogni giorno le spedizioni di pannelli in legno riciclato per l'industria del mobile, verso l'Italia e il resto del mondo, in coordinamento con il back office.",
+          "Negozio con i vettori su gomma e intermodale, gestisco i listini di riferimento e cerco nuovi partner di trasporto.",
+          "Ho gestito i tender marittimi su circa 20 rotte extra UE: raccoglievo le offerte di circa sei operatori, ne valutavo con il back office la qualità del servizio e assegnavo le rotte in base al rapporto tra servizio e costo per container.",
+          "Lavoro con SAP per i processi interni e con Transporeon per aste, tender e assegnazione dei viaggi."
         ],
         en: [
-          "I plan daily shipments of sales orders for Italy and abroad, working closely with the back office.",
-          "I coordinate and optimise ocean freight tender rates.",
-          "I negotiate with road and intermodal carriers, manage reference rate cards and scout new transport partners."
+          "I plan daily shipments of recycled wood panels for the furniture industry, across Italy and worldwide, working closely with the back office.",
+          "I negotiate with road and intermodal carriers, manage reference rate cards and scout new transport partners.",
+          "I ran ocean freight tenders on about 20 non-EU routes: I collected bids from around six providers, assessed their service quality with the back office and awarded each route on the balance between service and cost per container.",
+          "I use SAP for internal processes and Transporeon for auctions, tenders and load assignment."
         ]
       }
     },
@@ -88,12 +90,14 @@ window.CONTENT = {
       start: "2021-01", end: "2022-01",
       points: {
         it: [
-          "Ho definito le strategie di acquisizione e fidelizzazione dei clienti coordinando il mio team.",
-          "Ho gestito i rapporti con i fornitori di trasporto e i listini di riferimento, e curato la rendicontazione mensile dell'ufficio trasporti."
+          "Ho definito le strategie di acquisizione e fidelizzazione dei clienti coordinando il team, ufficio traffico compreso.",
+          "Seguivo un portafoglio clienti di settori diversi, per merci non deperibili e non pericolose, e ho acquisito nuovi clienti.",
+          "Ogni mese rendicontavo l'attività dell'ufficio trasporti: viaggi per cliente, margini dell'agenzia, costi di mezzi propri e autisti, gestione del parco mezzi."
         ],
         en: [
-          "I defined customer acquisition and retention strategies while leading my team.",
-          "I managed relationships with transport suppliers and reference rate cards, and owned the monthly reporting of the transport office."
+          "I defined customer acquisition and retention strategies while leading the team, traffic office included.",
+          "I managed a client portfolio across different sectors, for non-perishable and non-hazardous goods, and brought in new clients.",
+          "Every month I reported on the transport office: trips per client, brokerage margins, own-fleet and driver costs, fleet management."
         ]
       }
     },
@@ -103,8 +107,8 @@ window.CONTENT = {
       date: { it: "Mag 2020 – Gen 2021", en: "May 2020 – Jan 2021" },
       start: "2020-05", end: "2021-01",
       points: {
-        it: ["Ho seguito la fidelizzazione dei clienti e le pratiche commerciali, sviluppato i rapporti con i fornitori e cercato nuovi clienti."],
-        en: ["I handled customer retention and sales administration, developed supplier relationships and prospected new clients."]
+        it: ["Ho seguito la gestione e la fidelizzazione dei clienti, le loro richieste e le pratiche commerciali; ho sviluppato i rapporti con i fornitori di trasporto e cercato nuovi clienti."],
+        en: ["I handled customer management and retention, client requests and sales administration; I developed relationships with transport suppliers and prospected new clients."]
       }
     },
     {
@@ -113,8 +117,14 @@ window.CONTENT = {
       date: { it: "Lug 2018 – Mag 2020", en: "Jul 2018 – May 2020" },
       start: "2018-07", end: "2020-05",
       points: {
-        it: ["Ho coordinato la flotta e i tempi di guida e riposo degli autisti, programmato il traffico su bilico e gestito la compravendita dei viaggi."],
-        en: ["I coordinated the fleet and drivers' driving and rest times, planned articulated-truck traffic and managed the buying and selling of loads."]
+        it: [
+          "Gestivo l'attività di agenzia: acquistavo viaggi da vettori terzi e li rivendevo ai clienti, pianificando i trasporti in base alle vendite e in coordinamento con la flotta interna.",
+          "Programmavo il traffico su bilico nel rispetto dei tempi di guida e riposo degli autisti."
+        ],
+        en: [
+          "I ran the brokerage desk: I bought loads from third-party carriers and resold them to clients, planning transport around sales and in coordination with the in-house fleet.",
+          "I scheduled articulated-truck traffic in line with drivers' driving and rest times."
+        ]
       }
     },
     {
