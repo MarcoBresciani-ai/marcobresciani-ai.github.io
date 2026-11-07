@@ -2,8 +2,13 @@
   "use strict";
 
   var C = window.CONTENT;
+  var A = window.Apertura;
   var STORAGE_KEY = "lang";
-  var WORD_INTERVAL = 2400;
+  var INTRO_KEY = "introSeen";      /* apertura completa: solo alla prima visita della sessione */
+  var WORD_INTERVAL = 3000;
+  var WORD_INTERVAL_STILL = 4000;   /* con animazioni ridotte le parole cambiano senza girare */
+  var NARROW_HERO = 640;            /* sotto questa larghezza nome e parole vanno su due righe */
+  var FIELD_LEVEL = 0.6;            /* intensità dello sfondo: "Leggero" */
   var COUNTER_DURATION = 1200;
   var PANEL_OPEN_MS = 380;
   var PANEL_CLOSE_MS = 280;
@@ -15,8 +20,18 @@
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   var lang = initialLang();
 
+  var heroEl = null;
+  var stageEl = null;
+  var nameBoard = null;
+  var wordBoard = null;
+  var field = null;
+  var narrow = null;
   var wordIndex = 0;
   var wordTimer = null;
+  var introPending = false;  /* l'apertura partirà appena i font sono pronti */
+  var introRunning = false;
+  var heroStarted = false;
+
   var counterObserver = null;
   var countersDone = false;
 
@@ -57,25 +72,29 @@
     render();
   }
 
-  /* ---------- Hero ---------- */
+  /* ---------- Apertura: struttura e testi ---------- */
 
   function buildHero() {
-    var parts = C.name.split(" ");
-    var hero = document.getElementById("hero");
+    heroEl = document.getElementById("hero");
     var buttons = ["it", "en"].map(function (code) {
       return '<button class="lang__btn" type="button" data-lang="' + code + '">' + code.toUpperCase() + "</button>";
     }).join("");
 
-    hero.innerHTML =
+    /* Il tabellone è solo grafica: chi usa un lettore di schermo sente il nome e le parole in chiaro */
+    heroEl.innerHTML =
       '<div class="hero__bar"><div class="lang">' + buttons + "</div></div>" +
-      '<h1 class="hero__name"><span>' + esc(parts[0]) + "</span> <span>" + esc(parts[1]) + "</span></h1>" +
-      '<div class="hero__line">' +
-        '<p class="hero__word" id="heroWord"></p>' +
-        '<p class="sr-only" id="heroWords"></p>' +
-        '<p class="hero__tagline" id="heroTagline"></p>' +
+      '<div class="hero__stage" id="heroStage">' +
+        '<h1 class="sr-only">' + esc(C.name) + "</h1>" +
+        '<div class="board board--name" id="nameBoard" aria-hidden="true"></div>' +
+        '<div class="hero__sub">' +
+          '<div class="board board--words" id="wordBoard" aria-hidden="true"></div>' +
+          '<p class="sr-only" id="heroWords"></p>' +
+          '<p class="hero__tagline" id="heroTagline"></p>' +
+        "</div>" +
       "</div>";
+    stageEl = document.getElementById("heroStage");
 
-    hero.addEventListener("click", function (event) {
+    heroEl.addEventListener("click", function (event) {
       var button = event.target.closest("[data-lang]");
       if (button) { setLang(button.getAttribute("data-lang")); }
     });
@@ -87,55 +106,210 @@
       button.setAttribute("aria-pressed", String(button.getAttribute("data-lang") === lang));
     });
     document.getElementById("heroTagline").textContent = C.hero.tagline[lang];
-    startWords();
-  }
+    document.getElementById("heroWords").textContent = C.hero.words[lang].join(" · ");
+    wordIndex = wordIndex % C.hero.words[lang].length;
 
-  function startWords() {
-    var box = document.getElementById("heroWord");
-    var list = document.getElementById("heroWords");
-    var words = C.hero.words[lang];
-    var all = words.join(" · ");
-
-    window.clearInterval(wordTimer);
-    box.textContent = "";
-
-    if (reducedMotion.matches) {
-      /* Niente movimento: tutte le parole sono visibili insieme. */
-      box.className = "hero__word hero__word--static";
-      box.removeAttribute("aria-hidden");
-      box.textContent = all;
-      list.textContent = "";
+    if (!wordBoard) { return; }
+    if (!heroStarted) {
+      if (!introPending) { wordBoard.finish(wordLines(currentWord())); }
       return;
     }
-
-    box.className = "hero__word";
-    box.setAttribute("aria-hidden", "true");
-    list.textContent = all;
-    box.appendChild(wordSpan(words[wordIndex], ""));
-    wordTimer = window.setInterval(nextWord, WORD_INTERVAL);
+    /* Cambio lingua: l'apertura si chiude e le tessere girano sulla parola nell'altra lingua */
+    skip();
+    showWord(true);
+    scheduleWords();
   }
 
-  function wordSpan(text, state) {
-    var span = document.createElement("span");
-    span.className = "hero__word-in" + (state ? " " + state : "");
-    span.textContent = text;
-    return span;
+  /* ---------- Apertura: tabellone ---------- */
+
+  function upper(s) { return String(s).toUpperCase(); }
+
+  function longest(list) {
+    return Math.max.apply(null, list.map(function (s) { return s.length; }));
   }
 
-  function nextWord() {
-    if (document.hidden || currentPanel) { return; }
-    var box = document.getElementById("heroWord");
-    var words = C.hero.words[lang];
-    var old = box.lastElementChild;
+  function wrapWords(word, cols) {
+    var lines = [];
+    var cur = "";
+    word.split(" ").forEach(function (part) {
+      var candidate = cur ? cur + " " + part : part;
+      if (candidate.length <= cols) {
+        cur = candidate;
+      } else {
+        if (cur) { lines.push(cur); }
+        cur = part;
+      }
+    });
+    if (cur) { lines.push(cur); }
+    return lines;
+  }
 
-    wordIndex = (wordIndex + 1) % words.length;
+  /* Le parole delle due lingue: il tabellone deve poterle contenere tutte */
+  function allWords() { return C.hero.words.it.concat(C.hero.words.en).map(upper); }
 
-    if (old) {
-      old.classList.remove("is-entering");
-      old.classList.add("is-leaving");
-      old.addEventListener("animationend", function () { old.remove(); }, { once: true });
+  function nameLines() {
+    var name = upper(C.name);
+    return narrow ? name.split(" ") : [name];
+  }
+
+  function wordLines(word) { return narrow ? wrapWords(word, wordBoard.cols) : [word]; }
+
+  function currentWord() { return upper(C.hero.words[lang][wordIndex]); }
+
+  function buildBoards() {
+    var words = allWords();
+    var name = nameLines();
+    nameBoard.build(name.length, longest(name));
+
+    if (!narrow) {
+      wordBoard.build(1, longest(words));
+      return;
     }
-    box.appendChild(wordSpan(words[wordIndex], "is-entering"));
+    var parts = [].concat.apply([], words.map(function (w) { return w.split(" "); }));
+    var cols = Math.max(12, longest(parts));
+    var rows = Math.max.apply(null, words.map(function (w) { return wrapWords(w, cols).length; }));
+    wordBoard.build(rows, cols);
+  }
+
+  function layoutHero() {
+    var isNarrow = stageEl.clientWidth < NARROW_HERO;
+    if (isNarrow !== narrow) {
+      narrow = isNarrow;
+      buildBoards();
+      /* Cambio di forma a metà apertura: si chiude subito, come nel prototipo */
+      if (introRunning) { skip(); }
+      if (introPending) {
+        nameBoard.finish([]);
+        wordBoard.finish([]);
+      } else {
+        nameBoard.finish(nameLines());
+        wordBoard.finish(wordLines(currentWord()));
+      }
+    }
+    nameBoard.size();
+    wordBoard.size();
+  }
+
+  function showWord(animated) {
+    var lines = wordLines(currentWord());
+    if (!animated || reducedMotion.matches) {
+      wordBoard.finish(lines);
+      return Promise.resolve();
+    }
+    return wordBoard.animate(lines, "change");
+  }
+
+  function scheduleWords() {
+    window.clearTimeout(wordTimer);
+    wordTimer = window.setTimeout(function () {
+      /* In pausa a pagina nascosta o con un pannello aperto */
+      if (document.hidden || currentPanel) { scheduleWords(); return; }
+      wordIndex = (wordIndex + 1) % C.hero.words[lang].length;
+      showWord(true).then(scheduleWords);
+    }, reducedMotion.matches ? WORD_INTERVAL_STILL : WORD_INTERVAL);
+  }
+
+  /* ---------- Apertura: sequenza ----------
+     Sfondo quasi fermo, il nome gira lettera per lettera, le parole partono poco dopo.
+     Quando il nome si ferma parte un'onda e lo sfondo torna a reagire al cursore. */
+
+  function landed() {
+    var r = nameBoard.el.getBoundingClientRect();
+    field.pulse(r.left + r.width / 2, r.top + r.height / 2);
+    field.quiet(false);
+  }
+
+  function intro() {
+    introPending = false;
+    introRunning = true;
+    wordIndex = 0;
+    heroEl.classList.remove("is-waiting");
+    heroEl.classList.add("is-intro");
+    field.quiet(true);
+    nameBoard.finish([]);
+    wordBoard.finish([]);
+
+    var nameDone = nameBoard.animate(nameLines(), "intro");
+    var wordsDone = A.sleep(450).then(function () {
+      return introRunning ? wordBoard.animate(wordLines(currentWord()), "change") : null;
+    });
+
+    nameDone.then(function () {
+      if (!introRunning) { return null; }
+      landed();
+      return wordsDone.then(function () {
+        if (!introRunning) { return; }
+        introRunning = false;
+        scheduleWords();
+      });
+    });
+  }
+
+  /* Un clic o un tasto: tutto al suo posto, subito */
+  function skip() {
+    if (introPending) {
+      introPending = false;
+      heroEl.classList.remove("is-waiting");
+      nameBoard.finish(nameLines());
+      wordBoard.finish(wordLines(currentWord()));
+      field.quiet(false);
+      return;
+    }
+    if (!introRunning) { return; }
+    introRunning = false;
+    heroEl.classList.remove("is-intro");
+    nameBoard.finish(nameLines());
+    wordBoard.finish(wordLines(currentWord()));
+    landed();
+    scheduleWords();
+  }
+
+  function firstVisitOfSession() {
+    try {
+      if (window.sessionStorage.getItem(INTRO_KEY)) { return false; }
+      window.sessionStorage.setItem(INTRO_KEY, "1");
+    } catch (e) { /* memoria non disponibile: l'apertura parte */ }
+    return true;
+  }
+
+  function startHero() {
+    nameBoard = new A.Board(document.getElementById("nameBoard"));
+    wordBoard = new A.Board(document.getElementById("wordBoard"));
+    field = A.createField(document.getElementById("field"), {
+      level: FIELD_LEVEL,
+      reduced: function () { return reducedMotion.matches; }
+    });
+
+    /* Niente apertura con animazioni ridotte, dopo la prima visita o se si arriva su un pannello */
+    introPending = !reducedMotion.matches && !hashPanel() && firstVisitOfSession();
+    if (introPending) { heroEl.classList.add("is-waiting"); }
+    layoutHero();
+    field.init(introPending);
+
+    var queued = 0;
+    new ResizeObserver(function () {
+      window.cancelAnimationFrame(queued);
+      queued = window.requestAnimationFrame(layoutHero);
+    }).observe(stageEl);
+
+    var resizeTimer = null;
+    window.addEventListener("resize", function () {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(field.resize, 150);
+    });
+
+    document.addEventListener("pointerdown", function () { skip(); });
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Tab" && event.key !== "Shift") { skip(); }
+    });
+
+    var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    fontsReady.then(function () {
+      heroStarted = true;
+      nameBoard.size();
+      wordBoard.size();
+      if (introPending) { intro(); } else { scheduleWords(); }
+    });
   }
 
   /* ---------- Griglia ---------- */
@@ -153,6 +327,20 @@
       '<p class="timeline__meta">' + esc(job.company) + ' · <span class="timeline__date">' + t(job.date) + "</span></p>" +
       points +
     "</li>";
+  }
+
+  function timeline(jobs, withPoints) {
+    return '<ol class="timeline">' + jobs.map(function (job) {
+      return timelineItem(job, withPoints);
+    }).join("") + "</ol>";
+  }
+
+  function recentJobs() { return C.career.filter(function (job) { return !job.earlier; }); }
+  function earlierJobs() { return C.career.filter(function (job) { return job.earlier; }); }
+
+  /* "Aggiornato novembre 2026": riga piccola, le voci sono la parte grande */
+  function nowUpdated() {
+    return '<p class="now__updated">' + t(C.now.updatedLabel) + " · " + t(C.now.updated) + "</p>";
   }
 
   function chipList(items) {
@@ -175,43 +363,158 @@
     return '<section class="tile tile--' + id + '"><h2 class="tile__title">' + title + "</h2>" + body + "</section>";
   }
 
-  function renderBento() {
-    var numbers = C.numbers.map(function (n) {
-      return '<li><span class="number__value" data-value="' + n.value + '" data-suffix="' + esc(n.suffix) + '">' +
-        n.value + esc(n.suffix) + "</span>" +
-        '<span class="number__label">' + esc(n[lang]) + "</span></li>";
+  function numberValue(n) {
+    return '<span class="number__value" data-value="' + n.value + '" data-suffix="' + esc(n.suffix) + '">' +
+      n.value + esc(n.suffix) + "</span>";
+  }
+
+  /* Il primo numero è grande, gli altri piccoli sotto */
+  function numbersBody() {
+    var first = C.numbers[0];
+    return '<div class="numbers__big">' + numberValue(first) +
+        '<span class="number__label">' + esc(first[lang]) + "</span></div>" +
+      '<ul class="numbers__small">' + C.numbers.slice(1).map(function (n) {
+        return "<li>" + numberValue(n) + '<span class="number__label">' + esc(n[lang]) + "</span></li>";
+      }).join("") + "</ul>";
+  }
+
+  function contactBody() {
+    var email = C.contact.emailParts.join("@");
+    var links = '<a href="mailto:' + esc(email) + '">' + esc(email) + "</a>" +
+      C.contact.links.map(function (l) {
+        return '<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.label) + "</a>";
+      }).join("");
+    var cv = C.cv.map(function (f) {
+      return '<a href="' + esc(f.file) + '" download>' + t(C.titles.cv) + " " + esc(f.label) +
+        '<span class="download" aria-hidden="true"></span></a>';
     }).join("");
+    return '<div class="linklist">' + links + "</div>" + '<div class="linklist linklist--cv">' + cv + "</div>";
+  }
 
+  function renderBento() {
     var skills = C.skills[0];
-
     var now = C.now.items.map(function (item) {
       return '<li class="now__item">' + t(item.title) + "</li>";
     }).join("");
 
-    var cv = C.cv.map(function (f) {
-      return '<a href="' + esc(f.file) + '" download>' + esc(f.label) + "</a>";
+    /* Stesso ordine su telefono (impilati) e desktop (righe da 2/3 + 1/3, piena, 1/2 + 1/4 + 1/4) */
+    document.getElementById("bento").innerHTML =
+      tile("about", "about", '<p class="about__short">' + t(C.about.short) + "</p>") +
+      tile("numbers", "numbers", numbersBody()) +
+      tile("career", "career", careerBar()) +
+      tile("now", "now", nowUpdated() + '<ul class="now__list">' + now + "</ul>") +
+      tile("skills", "skills", '<p class="label">' + t(skills.title) + "</p>" + chipList(skills.items[lang])) +
+      tile("contact", "contact", contactBody());
+
+    activeRole = null;
+    setupCounters();
+    setupCareerGrow();
+  }
+
+  /* ---------- Percorso: barra del tempo ----------
+     Dal 2010 a oggi, un segmento per ruolo lungo quanto la sua durata.
+     Desktop: orizzontale, al passaggio del mouse mostra ruolo e date.
+     Telefono e tablet: verticale, con ruolo e date accanto a ogni segmento. */
+
+  var activeRole = null;
+  var careerObserver = null;
+  var careerGrown = false;
+
+  function toYears(s) {
+    var p = String(s).split("-");
+    return Number(p[0]) + (p[1] ? (Number(p[1]) - 1) / 12 : 0);
+  }
+
+  function todayYears() {
+    var d = new Date();
+    return d.getFullYear() + d.getMonth() / 12;
+  }
+
+  function currentRoleIndex() {
+    for (var i = 0; i < C.career.length; i++) { if (C.career[i].current) { return i; } }
+    return 0;
+  }
+
+  function roleReadout(i) {
+    var job = C.career[i];
+    return '<p class="cbar__readout-role">' + t(job.role) + "</p>" +
+      '<p class="cbar__readout-meta">' + esc(job.company) + " · " + t(job.date) + "</p>";
+  }
+
+  function careerBar() {
+    var jobs = C.career;
+    var end = todayYears();
+    var start = Math.min.apply(null, jobs.map(function (j) { return toYears(j.start); }));
+    var total = end - start;
+    var count = jobs.length;
+
+    var segments = jobs.map(function (job, i) {
+      var from = toYears(job.start);
+      var to = job.end ? toYears(job.end) : end;
+      var newer = jobs[i - 1];
+      var gap = newer ? Math.max(0, toYears(newer.start) - to) : 0;
+      var cls = "cbar__seg" + (job.current ? " is-current" : "") + (job.seasonal ? " is-seasonal" : "");
+      var style = "--from:" + ((from - start) / total).toFixed(4) +
+        ";--len:" + ((to - from) / total).toFixed(4) +
+        ";--years:" + (to - from).toFixed(2) +
+        ";--gap:" + gap.toFixed(2) +
+        ";--order:" + (count - 1 - i);
+      return '<li class="' + cls + '" data-panel="percorso" data-role="' + i + '" style="' + style + '">' +
+        '<span class="cbar__fill" aria-hidden="true"></span>' +
+        '<span class="cbar__label"><span class="cbar__role">' + t(job.role) + "</span>" +
+        '<span class="cbar__meta">' + esc(job.company) + " · " + t(job.date) + "</span></span>" +
+      "</li>";
     }).join("");
 
-    var email = C.contact.emailParts.join("@");
-    var contact = '<a href="mailto:' + esc(email) + '">' + esc(email) + "</a>" +
-      C.contact.links.map(function (l) {
-        return '<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.label) + "</a>";
-      }).join("");
+    var ticks = "";
+    for (var y = Math.ceil(start / 2) * 2; y <= end; y += 2) {
+      ticks += '<span class="cbar__tick" style="--at:' + ((y - start) / total).toFixed(4) + '">' + y + "</span>";
+    }
 
-    document.getElementById("bento").innerHTML =
-      tile("about", "about", "<p>" + t(C.about.short) + "</p>") +
-      tile("numbers", "numbers", '<ul class="numbers">' + numbers + "</ul>") +
-      tile("career", "career", '<ol class="timeline">' + C.career.slice(0, 5).map(function (job) {
-        return timelineItem(job, false);
-      }).join("") + "</ol>") +
-      tile("skills", "skills", '<p class="label">' + t(skills.title) + "</p>" + chipList(skills.items[lang])) +
-      tile("now", "now",
-        '<div><p class="label">' + t(C.now.updatedLabel) + '</p><p class="now__date">' + t(C.now.updated) + "</p></div>" +
-        '<ul class="now__list">' + now + "</ul>") +
-      tile("cv", "cv", '<div class="linklist linklist--row">' + cv + "</div>") +
-      tile("contact", "contact", '<div class="linklist">' + contact + "</div>");
+    var state = careerGrown || reducedMotion.matches || !("IntersectionObserver" in window) ? "" : " is-waiting";
+    return '<div class="cbar' + state + '">' +
+      '<div class="cbar__readout" aria-hidden="true">' + roleReadout(currentRoleIndex()) + "</div>" +
+      '<ol class="cbar__track">' + segments + "</ol>" +
+      '<div class="cbar__axis" aria-hidden="true">' + ticks + "</div>" +
+    "</div>";
+  }
 
-    setupCounters();
+  /* Ruolo sotto il cursore; null = torna al ruolo attuale */
+  function showRole(index) {
+    if (index === activeRole) { return; }
+    activeRole = index;
+    var bar = document.querySelector(".cbar");
+    if (!bar) { return; }
+    bar.querySelector(".cbar__readout").innerHTML = roleReadout(index === null ? currentRoleIndex() : index);
+    bar.classList.toggle("has-active", index !== null);
+    Array.prototype.forEach.call(bar.querySelectorAll(".cbar__seg"), function (seg) {
+      seg.classList.toggle("is-active", Number(seg.getAttribute("data-role")) === index);
+    });
+  }
+
+  function bindCareerBar() {
+    var bento = document.getElementById("bento");
+    bento.addEventListener("pointerover", function (event) {
+      if (event.pointerType !== "mouse") { return; }
+      var seg = event.target.closest(".cbar__seg");
+      showRole(seg ? Number(seg.getAttribute("data-role")) : null);
+    });
+    bento.addEventListener("pointerleave", function () { showRole(null); });
+  }
+
+  /* I segmenti crescono uno dopo l'altro, dal più vecchio, quando la barra entra nello schermo */
+  function setupCareerGrow() {
+    if (careerObserver) { careerObserver.disconnect(); }
+    var bar = document.querySelector(".cbar.is-waiting");
+    if (!bar) { return; }
+    careerObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) { return; }
+      careerObserver.disconnect();
+      careerGrown = true;
+      bar.classList.remove("is-waiting");
+      bar.classList.add("is-growing");
+    }, { threshold: 0.35 });
+    careerObserver.observe(bar);
   }
 
   /* ---------- Contatori ---------- */
@@ -266,9 +569,9 @@
         return '<li class="education__item"><h4 class="timeline__role">' + t(e.title) + "</h4>" +
           '<p class="timeline__meta">' + esc(e.school) + "</p></li>";
       }).join("");
-      return '<ol class="timeline">' + C.career.map(function (job) {
-        return timelineItem(job, true);
-      }).join("") + "</ol>" +
+      return timeline(recentJobs(), true) +
+      '<section class="panel__section"><h3 class="panel__subtitle">' + t(C.titles.earlier) + "</h3>" +
+      timeline(earlierJobs(), true) + "</section>" +
       '<section class="panel__section"><h3 class="panel__subtitle">' + t(C.titles.education) + "</h3>" +
       "<ul>" + education + "</ul></section>";
     }
@@ -280,9 +583,9 @@
       }).join("");
     }
 
-    return '<p class="label">' + t(C.now.updatedLabel) + '</p><p class="now__date">' + t(C.now.updated) + "</p>" +
+    return nowUpdated() +
       '<ul class="now__entries">' + C.now.items.map(function (item) {
-        return '<li class="now__entry"><h3 class="timeline__role">' + t(item.title) + "</h3><p>" + t(item.text) + "</p></li>";
+        return '<li class="now__entry"><h3 class="now__entry-title">' + t(item.title) + "</h3><p>" + t(item.text) + "</p></li>";
       }).join("") + "</ul>";
   }
 
@@ -323,6 +626,7 @@
     fillPanel(slug);
     panel.showModal();
     document.documentElement.classList.add("has-panel");
+    if (field) { field.pause(true); }
     window.requestAnimationFrame(function () { panel.setAttribute("data-state", "open"); });
     if (openedByClick && !reducedMotion.matches) { morphPanel(tileOf(slug), true); }
   }
@@ -348,6 +652,7 @@
 
   function resetPanelState() {
     document.documentElement.classList.remove("has-panel");
+    if (field) { field.pause(false); }
     currentPanel = null;
     openedByClick = false;
     closeRequested = false;
@@ -430,38 +735,6 @@
     window.addEventListener("hashchange", syncPanel);
   }
 
-  /* ---------- Alone che segue il cursore ---------- */
-
-  function bindHalo() {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) { return; }
-
-    var halo = document.getElementById("halo");
-    var radius = halo.offsetWidth / 2;
-    var x = 0;
-    var y = 0;
-    var queued = false;
-
-    function place() {
-      queued = false;
-      halo.style.transform = "translate3d(" + (x - radius) + "px, " + (y - radius) + "px, 0)";
-      halo.classList.add("is-on");
-    }
-
-    document.addEventListener("pointermove", function (event) {
-      if (event.pointerType !== "mouse") { return; }
-      x = event.clientX;
-      y = event.clientY;
-      if (!queued) {
-        queued = true;
-        window.requestAnimationFrame(place);
-      }
-    });
-
-    document.documentElement.addEventListener("pointerleave", function () {
-      halo.classList.remove("is-on");
-    });
-  }
-
   /* ---------- Avvio ---------- */
 
   function render() {
@@ -474,13 +747,18 @@
   }
 
   reducedMotion.addEventListener("change", function () {
-    if (reducedMotion.matches) { countersDone = true; }
+    if (reducedMotion.matches) {
+      countersDone = true;
+      skip();
+    }
+    if (field) { field.restart(); }
     render();
   });
 
   buildHero();
   bindPanel();
-  bindHalo();
+  bindCareerBar();
   render();
+  startHero();
   syncPanel();
 })();

@@ -21,7 +21,9 @@
   --text: #F2EBDD;
   --accent: #E06A33;
   --muted: #BFB7A8;
+  --text-dim: rgba(242, 235, 221, 0.62); /* avorio attenuato: titoli dei riquadri */
   --line: #3A3834;
+  --line-strong: #55524C;
 
   --gutter: 16px;
   --gap: 12px;
@@ -37,10 +39,7 @@ html {
   -webkit-text-size-adjust: 100%;
   /* La pagina non si sposta quando il pannello blocca lo scorrimento */
   scrollbar-gutter: stable;
-  /* Sfondo con grana leggera */
   background-color: var(--bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
-  background-size: 220px 220px;
 }
 
 html.has-panel { overflow: hidden; }
@@ -55,27 +54,31 @@ body {
   overflow-x: hidden;
 }
 
-/* Alone arancione che segue il cursore: solo con il mouse */
-.halo { display: none; }
+/* Livelli: sfondo generativo (0), grana (1), contenuti (2). I pannelli stanno sopra a tutto. */
+.field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
-@media (hover: hover) and (pointer: fine) {
-  .halo {
-    display: block;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 2;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(circle, rgba(224, 106, 51, 0.13), rgba(224, 106, 51, 0) 65%);
-    transition: opacity 300ms ease, transform 120ms ease-out;
-    will-change: transform;
-  }
+/* Grana leggera, sopra lo sfondo generativo */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-  .halo.is-on { opacity: 1; }
+.hero, .bento, .noscript {
+  position: relative;
+  z-index: 2;
 }
 
 .noscript { padding: 24px var(--gutter); }
@@ -98,21 +101,16 @@ a { color: inherit; }
   white-space: nowrap;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Apertura ---------- */
 .hero {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 20px var(--gutter) 28px;
-  container-type: inline-size;
+  padding: 20px var(--gutter) 0;
 }
 
 .hero__bar {
-  /* In primo piano: l'area del nome in Anton sale fin sopra il selettore */
-  position: relative;
-  z-index: 1;
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 20px;
 }
 
 .lang {
@@ -121,6 +119,7 @@ a { color: inherit; }
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: rgba(18, 18, 20, 0.6);
 }
 
 .lang__btn {
@@ -141,67 +140,127 @@ a { color: inherit; }
   color: var(--tile);
 }
 
-.hero__name {
-  font-family: var(--display);
-  font-weight: 400;
-  color: var(--accent);
-  text-transform: uppercase;
-  line-height: 1.02;
-  /* "BRESCIANI" in Anton misura 3,78 volte il corpo: riempie la riga */
-  font-size: calc(100cqw / 3.82);
-  letter-spacing: 0.005em;
+.hero__stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vw, 30px);
+  padding-block: clamp(36px, 9vh, 96px) clamp(28px, 6vh, 56px);
 }
 
-.hero__name span { display: block; }
-
-.hero__word {
-  position: relative;
-  margin-top: 14px;
-  height: 1.2em;
-  overflow: hidden;
-  font-family: var(--display);
-  /* La parola più lunga deve stare su una riga anche sui telefoni stretti */
-  font-size: min(2.5rem, calc(100cqw / 9.6));
-  line-height: 1.2;
-  white-space: nowrap;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.hero__word-in { display: block; }
-
-.hero__word-in.is-entering { animation: word-in 320ms cubic-bezier(0.7, 0, 0.2, 1) both; }
-
-.hero__word-in.is-leaving {
-  position: absolute;
-  left: 0;
-  top: 0;
-  animation: word-out 320ms cubic-bezier(0.7, 0, 0.2, 1) both;
-}
-
-@keyframes word-in {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-
-@keyframes word-out {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-100%); }
-}
-
-/* Animazioni ridotte: tutte le parole insieme, su più righe se serve */
-.hero__word--static {
-  height: auto;
-  overflow: visible;
-  white-space: normal;
+.hero__sub {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
 }
 
 .hero__tagline {
-  margin-top: 10px;
-  max-width: 44ch;
-  font-size: 1.0625rem;
+  max-width: 52ch;
+  font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
+  line-height: 1.5;
   color: var(--text);
 }
+
+/* La frase sale quando il tabellone ha quasi finito */
+.hero.is-waiting .hero__tagline { opacity: 0; }
+.hero.is-intro .hero__tagline { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.4s both; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Tabellone a palette ---------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 15), minmax(0, 1fr));
+  gap: var(--board-gap);
+  width: min(100%, calc(var(--cols, 15) * var(--flap-max) + (var(--cols, 15) - 1) * var(--board-gap)));
+}
+
+.board--name {
+  --flap-max: 92px;
+  --board-gap: clamp(3px, 0.6vw, 8px);
+  --flap-r: 5px;
+  --glyph: var(--accent);
+}
+
+.board--words {
+  --flap-max: 34px;
+  --board-gap: clamp(2px, 0.3vw, 4px);
+  --flap-r: 3px;
+  --glyph: var(--text);
+}
+
+.flap {
+  position: relative;
+  aspect-ratio: 0.68;
+  perspective: 320px;
+  border-radius: var(--flap-r);
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.7);
+}
+
+/* La fessura orizzontale tra le due metà */
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  z-index: 3;
+  height: 1px;
+  margin-top: -0.5px;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.flap__half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 50%;
+  overflow: hidden;
+}
+
+.flap__half--top {
+  top: 0;
+  border-radius: var(--flap-r) var(--flap-r) 0 0;
+  transform-origin: 50% 100%;
+  background: linear-gradient(#1A1A1D, #151518);
+}
+
+.flap__half--bottom {
+  bottom: 0;
+  border-radius: 0 0 var(--flap-r) var(--flap-r);
+  transform-origin: 50% 0;
+  background: linear-gradient(#141416, #121214);
+}
+
+.flap__half span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-size: var(--fs, 40px);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--glyph);
+}
+
+.flap__half--top span { top: 0; }
+.flap__half--bottom span { bottom: 0; }
+
+/* Le foglie che girano: visibili solo durante il cambio */
+.flap__half.is-leaf {
+  z-index: 2;
+  visibility: hidden;
+}
+
+.flap__half--top.is-leaf { background: linear-gradient(#1D1D20, #171719); }
 
 /* ---------- Griglia bento ---------- */
 .bento {
@@ -220,7 +279,8 @@ a { color: inherit; }
   flex-direction: column;
   gap: 14px;
   padding: 20px;
-  background: var(--tile);
+  /* Quasi pieno: lo sfondo generativo si intravede appena */
+  background: rgba(18, 18, 20, 0.88);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
@@ -236,14 +296,18 @@ a { color: inherit; }
 
 .tile:has(:focus-visible) { border-color: var(--accent); }
 
+/* Titoli piccoli e discreti: il contenuto del riquadro è la parte importante */
 .tile__title {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 1.5rem;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text-dim);
 }
 
 /* Il titolo è il pulsante, ma l'area cliccabile è tutto il riquadro */
@@ -317,28 +381,175 @@ a { color: inherit; }
   color: var(--muted);
 }
 
-/* Numeri */
-.numbers {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 16px;
+/* Chi sono */
+.about__short {
+  max-width: 46ch;
+  font-size: clamp(1.0625rem, 1.7vw, 1.3125rem);
+  line-height: 1.5;
+  text-wrap: pretty;
 }
+
+/* Numeri: riquadro arancione pieno, testo grafite */
+.tile--numbers {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.tile--numbers .tile__title { color: rgba(28, 28, 30, 0.72); }
 
 .number__value {
   display: block;
   font-family: var(--display);
-  font-size: 3.25rem;
-  line-height: 1.05;
-  color: var(--accent);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
 
-.number__label {
-  display: block;
+.number__label { display: block; }
+
+.numbers__big {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.numbers__big .number__value {
+  font-size: clamp(4rem, 8vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+}
+
+.numbers__big .number__label {
+  max-width: 14ch;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.numbers__small {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(28, 28, 30, 0.25);
+}
+
+.numbers__small .number__value {
+  font-size: 1.875rem;
+  line-height: 1;
+}
+
+.numbers__small .number__label {
   margin-top: 4px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+/* ---------- Percorso: barra del tempo ----------
+   Telefono e tablet: verticale, il più recente in alto, ruolo e date accanto.
+   Desktop: orizzontale da 2010 a oggi, ruolo e date al passaggio del mouse. */
+.cbar__readout,
+.cbar__axis { display: none; }
+
+.cbar__track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Il filo che unisce i segmenti */
+.cbar__track::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.cbar__seg {
+  position: relative;
+  /* Sopra l'area cliccabile del riquadro: anche i segmenti aprono il pannello */
+  z-index: 2;
+  min-height: max(46px, calc(var(--years) * 26px));
+  margin-top: calc(var(--gap) * 26px);
+  padding-left: 24px;
+  cursor: pointer;
+}
+
+.cbar__seg:first-child { margin-top: 0; }
+
+.cbar__fill {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 9px;
+  border-radius: 999px;
+  background: rgba(242, 235, 221, 0.4);
+  transform-origin: 50% 100%;
+}
+
+.cbar__seg.is-seasonal .cbar__fill {
+  background: transparent;
+  border: 1.5px dashed rgba(242, 235, 221, 0.55);
+}
+
+/* Ruolo attuale: aperto verso il futuro, con il pallino arancione al suo inizio */
+.cbar__seg.is-current .cbar__fill {
+  top: 0;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(to top, var(--text) 55%, rgba(242, 235, 221, 0));
+}
+
+.cbar__seg.is-current::after {
+  content: "";
+  position: absolute;
+  left: -2.5px;
+  bottom: 0;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--tile);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.cbar__label {
+  display: flex;
+  flex-direction: column;
+}
+
+.cbar__role {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cbar__meta {
+  font-size: 0.8125rem;
   line-height: 1.35;
   color: var(--muted);
+}
+
+/* Crescita all'ingresso nello schermo, dal ruolo più vecchio */
+.cbar.is-waiting .cbar__fill { transform: scaleY(0); }
+
+.cbar.is-growing .cbar__fill {
+  animation: grow-y 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--order) * 90ms);
+}
+
+@keyframes grow-y {
+  from { transform: scaleY(0); }
+  to   { transform: none; }
+}
+
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+  to   { transform: none; }
 }
 
 /* Linea del tempo */
@@ -369,12 +580,15 @@ a { color: inherit; }
   top: 6px;
   width: 9px;
   height: 9px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--muted);
   border-radius: 50%;
   background: var(--tile);
 }
 
-.timeline__item--current .timeline__dot { background: var(--accent); }
+.timeline__item--current .timeline__dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
 
 .timeline__role {
   font-size: 1.0625rem;
@@ -404,21 +618,28 @@ a { color: inherit; }
   line-height: 1.3;
 }
 
-/* Ora */
-.now__date {
-  font-family: var(--display);
-  font-size: clamp(2.25rem, 11vw, 3.5rem);
-  line-height: 1.05;
-  text-transform: uppercase;
-  color: var(--text);
+/* Ora: la data è una riga piccola, le voci sono la parte grande, come un tabellone */
+.now__updated {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .now__list { border-top: 1px solid var(--line); }
 
+.now__item,
+.now__entry-title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.625rem, 7vw, 2.25rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
 .now__item {
-  padding: 9px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--line);
-  font-weight: 600;
 }
 
 /* CV e Contatti */
@@ -441,16 +662,24 @@ a { color: inherit; }
 
 .linklist a:hover { text-decoration-color: var(--accent); }
 
-.linklist--row {
+/* I due CV in fondo al riquadro Contatti */
+.linklist--cv {
   flex-direction: row;
-  gap: 18px;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
-.linklist--row a {
-  font-family: var(--display);
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 1.2;
+.download {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-3px) rotate(45deg);
 }
 
 /* ---------- Pannello ---------- */
@@ -502,7 +731,7 @@ a { color: inherit; }
   line-height: 1.15;
   letter-spacing: 0.01em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text);
 }
 
 .panel__close {
@@ -569,14 +798,16 @@ a { color: inherit; }
   border-top: 1px solid var(--line);
 }
 
+/* Stesso stile dei titoli dei riquadri */
 .panel__subtitle {
-  margin-bottom: 12px;
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 1.5rem;
-  line-height: 1.15;
+  margin-bottom: 14px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text-dim);
 }
 
 .education__item + .education__item { margin-top: 12px; }
@@ -585,24 +816,21 @@ a { color: inherit; }
 
 .panel__group .label { margin-bottom: 8px; }
 
-.now__entries { margin-top: 16px; border-top: 1px solid var(--line); }
+.now__entries { margin-top: 12px; border-top: 1px solid var(--line); }
 
 .now__entry {
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--line);
 }
+
+.now__entry p { margin-top: 4px; }
 
 /* ---------- Tablet ---------- */
 @media (min-width: 640px) {
   :root { --gutter: 24px; --gap: 14px; }
 
-  /* Nome su una riga: "MARCO BRESCIANI" misura 6,72 volte il corpo */
-  .hero__name { font-size: calc(100cqw / 6.76); white-space: nowrap; }
-  .hero__name span { display: inline; }
-
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tile--about, .tile--numbers, .tile--career, .tile--skills, .tile--now { grid-column: span 2; }
-  .numbers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tile--about, .tile--numbers, .tile--career, .tile--now { grid-column: span 2; }
 
   .panel {
     width: min(760px, calc(100vw - 48px));
@@ -610,7 +838,7 @@ a { color: inherit; }
     max-height: calc(100vh - 48px);
     max-height: calc(100dvh - 48px);
     margin: auto;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   }
@@ -623,33 +851,120 @@ a { color: inherit; }
 @media (min-width: 1024px) {
   :root { --gutter: 32px; }
 
-  .hero { padding-top: 24px; }
-  .hero__bar { margin-bottom: 8px; }
-  .hero__line {
+  /* Riga 1: Chi sono 2/3 + Numeri 1/3. Riga 2: Percorso. Riga 3: Ora 1/2 + Competenze 1/4 + Contatti 1/4 */
+  .bento { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .tile--about   { grid-column: span 8; }
+  .tile--numbers { grid-column: span 4; }
+  .tile--career  { grid-column: span 12; }
+  .tile--now     { grid-column: span 6; }
+  .tile--skills  { grid-column: span 3; }
+  .tile--contact { grid-column: span 3; }
+
+  /* Barra del tempo orizzontale */
+  .cbar {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 32px;
-  }
-  .hero__word { flex: 1 1 auto; min-width: 0; font-size: 2.75rem; margin-top: 10px; }
-  .hero__tagline { margin-top: 0; text-align: right; flex: 0 1 44ch; }
-
-  .bento {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-areas:
-      "about  about  career career"
-      "number number career career"
-      "skills now    now    cv"
-      "skills now    now    contact";
+    flex-direction: column;
+    gap: 14px;
   }
 
-  .tile--about   { grid-area: about; }
-  .tile--numbers { grid-area: number; }
-  .tile--career  { grid-area: career; }
-  .tile--skills  { grid-area: skills; }
-  .tile--now     { grid-area: now; }
-  .tile--cv      { grid-area: cv; }
-  .tile--contact { grid-area: contact; }
+  .cbar__readout { display: block; min-height: 3.4em; }
+
+  .cbar__readout-role {
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .cbar__readout-meta {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .cbar__track {
+    display: block;
+    height: 40px;
+  }
+
+  .cbar__track::before {
+    left: 0;
+    right: 0;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 1px;
+  }
+
+  .cbar__seg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--from) * 100%);
+    width: calc(var(--len) * 100%);
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cbar__fill {
+    left: 2px;
+    right: 2px;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 12px;
+    margin-top: -6px;
+    transform-origin: 0 50%;
+    transition: background-color 200ms ease, opacity 200ms ease;
+  }
+
+  .cbar__seg.is-current .cbar__fill {
+    top: 50%;
+    right: 0;
+    border-radius: 999px 0 0 999px;
+    background: linear-gradient(to right, var(--text) 55%, rgba(242, 235, 221, 0));
+  }
+
+  .cbar__seg.is-current::after {
+    left: -2px;
+    top: 50%;
+    bottom: auto;
+    margin-top: -7px;
+  }
+
+  /* Al passaggio del mouse il ruolo si accende, gli altri si attenuano */
+  .cbar.has-active .cbar__seg:not(.is-active) .cbar__fill { opacity: 0.4; }
+  .cbar__seg.is-active .cbar__fill { background-color: var(--text); }
+  .cbar__seg.is-seasonal.is-active .cbar__fill { background-color: rgba(242, 235, 221, 0.25); }
+
+  /* Su desktop ruolo e date si leggono in alto: le etichette restano solo per i lettori di schermo */
+  .cbar__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .cbar__axis {
+    position: relative;
+    display: block;
+    height: 1.3em;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cbar__tick {
+    position: absolute;
+    left: calc(var(--at) * 100%);
+    transform: translateX(-50%);
+  }
+
+  .cbar__tick:first-child { transform: none; }
+
+  .cbar.is-waiting .cbar__fill { transform: scaleX(0); }
+  .cbar.is-growing .cbar__fill { animation-name: grow-x; }
 }
 
 /* Riquadro Contatti stretto: l'email deve restare su una riga */
@@ -661,7 +976,8 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .tile, .tile__plus, .tile__plus::before, .tile__plus::after,
   .panel::backdrop, .panel__close, .linklist a { transition: none; }
-  .halo { display: none; }
+  .hero.is-intro .hero__tagline { animation: none; }
   .tile:hover { transform: none; box-shadow: none; }
   .tile:hover .tile__plus { transform: none; }
+  .cbar__fill { transition: none; }
 }

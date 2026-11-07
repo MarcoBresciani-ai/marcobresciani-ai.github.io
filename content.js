@@ -21,6 +21,7 @@ window.CONTENT = {
     about:     { it: "Chi sono",    en: "About" },
     numbers:   { it: "Numeri",      en: "Numbers" },
     career:    { it: "Percorso",    en: "Career" },
+    earlier:   { it: "Esperienze precedenti", en: "Earlier experience" },
     education: { it: "Formazione",  en: "Education" },
     skills:    { it: "Competenze",  en: "Skills" },
     now:       { it: "Ora",         en: "Now" },
@@ -53,18 +54,20 @@ window.CONTENT = {
     { value: 16, suffix: "+", it: "anni di esperienza lavorativa", en: "years of work experience" },
     { value: 8,  suffix: "+", it: "anni in trasporti e logistica", en: "years in transport & logistics" },
     { value: 3,  suffix: "",  it: "ruoli in crescita in Sogema",   en: "progressive roles at Sogema" },
-    { value: 4,  suffix: "",  it: "anni con Midjourney",           en: "years with Midjourney" },
-    { value: 2,  suffix: "",  it: "anni di studio dell'AI applicata al lavoro", en: "years studying AI applied to work" },
     { value: 2,  suffix: "",  it: "lingue",                        en: "languages" }
   ],
 
-  /* Dal più recente al più vecchio. current: true = pallino pieno. */
+  /* Dal più recente al più vecchio. current: true = ruolo attuale (pallino arancione, barra aperta).
+     earlier: true = nel pannello sta sotto "Esperienze precedenti".
+     start / end: date per la barra del tempo, "anno-mese" oppure solo "anno" (= gennaio).
+     Il ruolo attuale non ha end: la barra arriva a oggi. seasonal: true = segmento tratteggiato. */
   career: [
     {
       current: true,
       role: { it: "Logistic Planner", en: "Logistic Planner" },
       company: "Gruppo Mauro Saviola Srl",
       date: { it: "Feb 2022 – oggi", en: "Feb 2022 – present" },
+      start: "2022-02",
       points: {
         it: [
           "Pianifico ogni giorno le spedizioni degli ordini di vendita per l'Italia e l'estero, in coordinamento con il back office.",
@@ -82,6 +85,7 @@ window.CONTENT = {
       role: { it: "Responsabile commerciale", en: "Sales Manager" },
       company: "Sogema Group Srl",
       date: { it: "Gen 2021 – Gen 2022", en: "Jan 2021 – Jan 2022" },
+      start: "2021-01", end: "2022-01",
       points: {
         it: [
           "Ho definito le strategie di acquisizione e fidelizzazione dei clienti coordinando il mio team.",
@@ -97,6 +101,7 @@ window.CONTENT = {
       role: { it: "Commerciale", en: "Sales Representative" },
       company: "Sogema Group Srl",
       date: { it: "Mag 2020 – Gen 2021", en: "May 2020 – Jan 2021" },
+      start: "2020-05", end: "2021-01",
       points: {
         it: ["Ho seguito la fidelizzazione dei clienti e le pratiche commerciali, sviluppato i rapporti con i fornitori e cercato nuovi clienti."],
         en: ["I handled customer retention and sales administration, developed supplier relationships and prospected new clients."]
@@ -106,33 +111,41 @@ window.CONTENT = {
       role: { it: "Disponente al traffico", en: "Traffic Coordinator" },
       company: "Sogema Group Srl",
       date: { it: "Lug 2018 – Mag 2020", en: "Jul 2018 – May 2020" },
+      start: "2018-07", end: "2020-05",
       points: {
         it: ["Ho coordinato la flotta e i tempi di guida e riposo degli autisti, programmato il traffico su bilico e gestito la compravendita dei viaggi."],
         en: ["I coordinated the fleet and drivers' driving and rest times, planned articulated-truck traffic and managed the buying and selling of loads."]
       }
     },
     {
+      earlier: true,
       role: { it: "Impiegato commerciale", en: "Sales Clerk" },
       company: "Ditta individuale Bresciani Paolo",
       date: { it: "2016–2018", en: "2016–2018" },
+      start: "2016", end: "2018",
       points: {
         it: ["Supporto commerciale con clienti e fornitori; costruzione di torce MIG raffreddate ad acqua."],
         en: ["Sales support with customers and suppliers; assembly of water-cooled MIG welding torches."]
       }
     },
     {
+      earlier: true,
       role: { it: "Assistente alle vendite", en: "Sales Assistant" },
       company: "Supermercati Tosano",
       date: { it: "2013–2016", en: "2013–2016" },
+      start: "2013", end: "2016",
       points: {
         it: ["Ordini e resi dei reparti, layout espositivo, cassa e chiusure."],
         en: ["Department orders and returns, product display layout, checkout and daily closing."]
       }
     },
     {
+      earlier: true,
+      seasonal: true,
       role: { it: "Esattore pedaggi stagionale", en: "Seasonal Toll Collector" },
       company: "Autostrade del Brennero SpA",
       date: { it: "2010–2012", en: "2010–2012" },
+      start: "2010", end: "2012",
       points: {
         it: ["Lavoro estivo per mantenermi agli studi universitari."],
         en: ["Summer job to support myself through university."]
@@ -188,10 +201,10 @@ window.CONTENT = {
     updated: { it: "novembre 2026", en: "November 2026" },
     items: [
       {
-        title: { it: "Midjourney e Higgsfield", en: "Midjourney and Higgsfield" },
+        title: { it: "Arte generativa", en: "Generative art" },
         text: {
-          it: "Progetto workflow creativi con Midjourney e Higgsfield, dall'idea alla serie finita.",
-          en: "I design creative workflows with Midjourney and Higgsfield, from idea to finished series."
+          it: "Progetto workflow creativi con Midjourney, dall'idea alla serie finita.",
+          en: "I design creative workflows with Midjourney, from idea to finished series."
         }
       },
       {
@@ -202,10 +215,10 @@ window.CONTENT = {
         }
       },
       {
-        title: { it: "Claude e ChatGPT", en: "Claude and ChatGPT" },
+        title: { it: "Questo sito", en: "This website" },
         text: {
-          it: "I modelli AI con cui lavoro.",
-          en: "The AI models I work with."
+          it: "L'ho costruito da zero con Claude Code, senza esperienza di programmazione.",
+          en: "I built it from scratch with Claude Code, with no prior coding experience."
         }
       },
       {
