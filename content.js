@@ -13,7 +13,7 @@ window.CONTENT = {
     },
     tagline: {
       it: "Pianifico, negozio, sperimento. Dalla logistica all'AI, con lo stesso spirito competitivo.",
-      en: "I plan, negotiate, experiment. From logistics to AI, with the same competitive drive."
+      en: "I plan, negotiate and experiment. From logistics to AI, with the same competitive drive."
     }
   },
 
@@ -36,7 +36,7 @@ window.CONTENT = {
   about: {
     short: {
       it: "Logistic planner con una laurea in economia e marketing e la curiosità di chi vuole sempre capire come funzionano le cose. Dalla gestione dei trasporti alla strategia commerciale, fino all'intelligenza artificiale applicata al lavoro.",
-      en: "Logistic planner with a degree in economics and marketing, and the curiosity of someone who always wants to understand how things work. From transport management to sales strategy, all the way to AI applied to work."
+      en: "Logistics planner with a degree in Economics and Marketing and a habit of wanting to know how things really work. From moving freight to sales strategy, and now AI applied to work."
     },
     long: {
       it: [
@@ -44,17 +44,17 @@ window.CONTENT = {
         "Sono proattivo, curioso e mi metto in gioco, nel lavoro come nella vita. Sono sportivo da quando ero bambino e ascolto moltissima musica: oltre 22.000 minuti in un anno su Spotify, con l'idea di arrivare prima o poi a farla. Fuori dal lavoro esploro anche l'intelligenza artificiale: progetto workflow creativi con Midjourney e studio come l'AI sta cambiando il modo di lavorare."
       ],
       en: [
-        "I started working while still at university and never stopped: from a motorway toll booth to large-scale retail, from transport planning to leading a sales office. In two and a half years I went from coordinating loads to heading sales; today I plan shipments across Italy and worldwide and negotiate with road and intermodal carriers.",
-        "I'm proactive and curious, and I like to put myself to the test, at work and in life. I've been into sport since I was a kid and I listen to a huge amount of music: more than 22,000 minutes a year on Spotify, with the hope of making some of my own one day. Outside work I also explore artificial intelligence: I design creative workflows with Midjourney and study how AI is changing the way we work."
+        "I started working while I was still at university and haven't stopped since: from a motorway toll booth to supermarket retail, from planning transport to running a sales office. In two and a half years I went from planning loads to heading up sales; today I plan shipments across Italy and worldwide and negotiate with road and intermodal carriers.",
+        "I'm proactive and curious, and I like to push myself, at work and in life. I've played sport since I was a kid and I listen to an enormous amount of music (over 22,000 minutes a year on Spotify); one day I'd like to make some of my own. Outside work I'm exploring AI: I design creative workflows in Midjourney and study how AI is changing the way we work."
       ]
     }
   },
 
   numbers: [
     { value: 16, suffix: "+", it: "anni di esperienza lavorativa", en: "years of work experience" },
-    { value: 8,  suffix: "+", it: "anni in trasporti e logistica", en: "years in transport & logistics" },
+    { value: 8,  suffix: "+", it: "anni in trasporti e logistica", en: "years in transport and logistics" },
     { value: 5,  suffix: "",  it: "settori attraversati, dalla grande distribuzione all'industria", en: "sectors, from retail to manufacturing" },
-    { value: 20, suffix: "",  it: "rotte extra UE gestite nei tender marittimi", en: "non-EU routes managed in ocean freight tenders" }
+    { value: 20, suffix: "",  it: "rotte extra UE gestite nei tender marittimi", en: "non-EU lanes run through ocean freight tenders" }
   ],
 
   /* Dal più recente al più vecchio. current: true = ruolo attuale (pallino arancione, barra aperta).
@@ -64,7 +64,7 @@ window.CONTENT = {
   career: [
     {
       current: true,
-      role: { it: "Logistic Planner", en: "Logistic Planner" },
+      role: { it: "Logistic Planner", en: "Logistics Planner" },
       company: "Gruppo Mauro Saviola Srl",
       date: { it: "Feb 2022 – oggi", en: "Feb 2022 – present" },
       start: "2022-02",
@@ -76,10 +76,10 @@ window.CONTENT = {
           "Lavoro con SAP per i processi interni e con Transporeon per aste, tender e assegnazione dei viaggi."
         ],
         en: [
-          "I plan daily shipments of recycled wood panels for the furniture industry, across Italy and worldwide, working closely with the back office.",
-          "I negotiate with road and intermodal carriers, manage reference rate cards and scout new transport partners.",
-          "I ran ocean freight tenders on about 20 non-EU routes: I collected bids from around six providers, assessed their service quality with the back office and awarded each route on the balance between service and cost per container.",
-          "I use SAP for internal processes and Transporeon for auctions, tenders and load assignment."
+          "I plan daily outbound shipments of recycled wood panels for the furniture industry, to customers across Italy and worldwide, working closely with the back-office team.",
+          "I negotiate rates with road and intermodal carriers, maintain benchmark rate cards and source new transport partners.",
+          "I ran ocean freight tenders on around 20 non-EU lanes: I gathered bids from roughly six forwarders, assessed their service levels with the back office and awarded each lane on the balance between service and cost per container.",
+          "I use SAP for internal processes and Transporeon for spot auctions, tenders and load allocation."
         ]
       }
     },
@@ -95,9 +95,9 @@ window.CONTENT = {
           "Ogni mese rendicontavo l'attività dell'ufficio trasporti: viaggi per cliente, margini dell'agenzia, costi di mezzi propri e autisti, gestione del parco mezzi."
         ],
         en: [
-          "I defined customer acquisition and retention strategies while leading the team, traffic office included.",
-          "I managed a client portfolio across different sectors, for non-perishable and non-hazardous goods, and brought in new clients.",
-          "Every month I reported on the transport office: trips per client, brokerage margins, own-fleet and driver costs, fleet management."
+          "I set the customer acquisition and retention strategy and led the team, traffic office included.",
+          "I managed a multi-sector client portfolio for non-perishable, non-hazardous freight and won new accounts.",
+          "Every month I produced the transport office's reporting: trips per client, brokerage margins, own-fleet and driver costs, and fleet management."
         ]
       }
     },
@@ -108,11 +108,11 @@ window.CONTENT = {
       start: "2020-05", end: "2021-01",
       points: {
         it: ["Ho seguito la gestione e la fidelizzazione dei clienti, le loro richieste e le pratiche commerciali; ho sviluppato i rapporti con i fornitori di trasporto e cercato nuovi clienti."],
-        en: ["I handled customer management and retention, client requests and sales administration; I developed relationships with transport suppliers and prospected new clients."]
+        en: ["I managed and retained client accounts, handled customer requests and sales administration, built relationships with transport suppliers and prospected for new business."]
       }
     },
     {
-      role: { it: "Disponente al traffico", en: "Traffic Coordinator" },
+      role: { it: "Disponente al traffico", en: "Transport Planner" },
       company: "Sogema Group Srl",
       date: { it: "Lug 2018 – Mag 2020", en: "Jul 2018 – May 2020" },
       start: "2018-07", end: "2020-05",
@@ -122,20 +122,20 @@ window.CONTENT = {
           "Programmavo il traffico su bilico nel rispetto dei tempi di guida e riposo degli autisti."
         ],
         en: [
-          "I ran the brokerage desk: I bought loads from third-party carriers and resold them to clients, planning transport around sales and in coordination with the in-house fleet.",
-          "I scheduled articulated-truck traffic in line with drivers' driving and rest times."
+          "I ran the freight brokerage desk: I bought capacity from third-party hauliers and sold it on to clients, planning transport around sales and in coordination with the in-house fleet.",
+          "I scheduled articulated-truck traffic in compliance with EU drivers' hours rules."
         ]
       }
     },
     {
       earlier: true,
-      role: { it: "Impiegato commerciale", en: "Sales Clerk" },
+      role: { it: "Impiegato commerciale", en: "Sales Administrator" },
       company: "Ditta individuale Bresciani Paolo",
       date: { it: "2016–2018", en: "2016–2018" },
       start: "2016", end: "2018",
       points: {
         it: ["Supporto commerciale con clienti e fornitori; costruzione di torce MIG raffreddate ad acqua."],
-        en: ["Sales support with customers and suppliers; assembly of water-cooled MIG welding torches."]
+        en: ["I supported sales with customers and suppliers and assembled water-cooled MIG welding torches."]
       }
     },
     {
@@ -146,7 +146,7 @@ window.CONTENT = {
       start: "2013", end: "2016",
       points: {
         it: ["Ordini e resi dei reparti, layout espositivo, cassa e chiusure."],
-        en: ["Department orders and returns, product display layout, checkout and daily closing."]
+        en: ["I handled department orders and returns, product displays, till operations and end-of-day cash-up."]
       }
     },
     {
@@ -158,14 +158,14 @@ window.CONTENT = {
       start: "2010", end: "2012",
       points: {
         it: ["Lavoro estivo per mantenermi agli studi universitari."],
-        en: ["Summer job to support myself through university."]
+        en: ["Summer work to fund my university studies."]
       }
     }
   ],
 
   education: [
     { title: { it: "Laurea in Economia e Marketing", en: "Degree in Economics and Marketing" }, school: "Università di Parma" },
-    { title: { it: "Diploma di Geometra", en: "Surveying Technician Diploma" }, school: "ITG Carlo D'Arco" }
+    { title: { it: "Diploma di Geometra", en: "Technical high school diploma in Surveying" }, school: "ITG Carlo D'Arco" }
   ],
 
   skills: [
@@ -173,7 +173,7 @@ window.CONTENT = {
       title: { it: "Professionali", en: "Professional" },
       items: {
         it: ["Pianificazione logistica", "Negoziazione con i fornitori", "Strategia commerciale", "Gestione e fidelizzazione clienti", "Coordinamento del team", "Reporting"],
-        en: ["Logistics planning", "Supplier negotiation", "Sales strategy", "Customer management & retention", "Team coordination", "Reporting"]
+        en: ["Logistics planning", "Carrier and supplier negotiation", "Sales strategy", "Account management & retention", "Team leadership", "Reporting"]
       }
     },
     {
@@ -194,14 +194,14 @@ window.CONTENT = {
       title: { it: "AI", en: "AI" },
       items: {
         it: ["Claude", "Claude Code", "ChatGPT", "Midjourney (4 anni di esperienza)", "Higgsfield (video)"],
-        en: ["Claude", "Claude Code", "ChatGPT", "Midjourney (4 years of experience)", "Higgsfield (video)"]
+        en: ["Claude", "Claude Code", "ChatGPT", "Midjourney (4 years)", "Higgsfield (video)"]
       }
     },
     {
       title: { it: "Lingue", en: "Languages" },
       items: {
         it: ["Italiano: madrelingua", "Inglese: B1–B2, in miglioramento"],
-        en: ["Italiano: native", "English: B1–B2, improving"]
+        en: ["Italian: native", "English: intermediate (B1–B2)"]
       }
     }
   ],
@@ -214,14 +214,14 @@ window.CONTENT = {
         title: { it: "Arte generativa", en: "Generative art" },
         text: {
           it: "Progetto workflow creativi con Midjourney, dall'idea alla serie finita.",
-          en: "I design creative workflows with Midjourney, from idea to finished series."
+          en: "I design creative workflows in Midjourney, from first concept to finished series."
         }
       },
       {
         title: { it: "AI applicata al lavoro", en: "AI at work" },
         text: {
           it: "Studio come l'intelligenza artificiale può rendere più efficaci analisi, decisioni e processi.",
-          en: "I study how artificial intelligence can make analysis, decisions and processes more effective."
+          en: "I'm exploring how AI can make analysis, decisions and processes more effective."
         }
       },
       {
@@ -235,7 +235,7 @@ window.CONTENT = {
         title: { it: "Inglese", en: "English" },
         text: {
           it: "Lo alleno ogni giorno per passare dal B1–B2 a un livello pienamente professionale.",
-          en: "Training it every day to move from B1–B2 to a fully professional level."
+          en: "I practise every day to take my English from intermediate to fully professional."
         }
       }
     ]
