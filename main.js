@@ -308,6 +308,7 @@
       heroStarted = true;
       nameBoard.size();
       wordBoard.size();
+      fitCareerNames(); /* con il font vero le misure cambiano */
       if (introPending) { intro(); } else { scheduleWords(); }
     });
   }
@@ -392,23 +393,28 @@
   }
 
   function renderBento() {
-    var skills = C.skills[0];
+    var skills = C.skills.filter(function (group) { return group.tile; }).map(function (group) {
+      return '<div class="skills__group"><h3 class="label">' + t(group.title) + "</h3>" + chipList(group.items[lang]) + "</div>";
+    }).join("");
     var now = C.now.items.map(function (item) {
-      return '<li class="now__item">' + t(item.title) + "</li>";
+      return '<li class="now__item"><h3 class="now__item-title">' + t(item.title) + "</h3>" +
+        '<p class="now__item-text">' + t(item.text) + "</p></li>";
     }).join("");
 
     /* Stesso ordine su telefono (impilati) e desktop (righe da 2/3 + 1/3, piena, 1/2 + 1/4 + 1/4) */
     document.getElementById("bento").innerHTML =
-      tile("about", "about", '<p class="about__short">' + t(C.about.short) + "</p>") +
+      tile("about", "about", '<p class="about__short">' + t(C.about.short) + "</p>" +
+        '<p class="about__personal">' + t(C.about.personal) + "</p>") +
       tile("numbers", "numbers", numbersBody()) +
       tile("career", "career", careerBar()) +
       tile("now", "now", nowUpdated() + '<ul class="now__list">' + now + "</ul>") +
-      tile("skills", "skills", '<p class="label">' + t(skills.title) + "</p>" + chipList(skills.items[lang])) +
+      tile("skills", "skills", skills) +
       tile("contact", "contact", contactBody());
 
     activeRole = null;
     setupCounters();
     setupCareerGrow();
+    fitCareerNames();
   }
 
   /* ---------- Percorso: barra del tempo ----------
@@ -459,8 +465,10 @@
         ";--years:" + (to - from).toFixed(2) +
         ";--gap:" + gap.toFixed(2) +
         ";--order:" + (count - 1 - i);
+      /* Nome del ruolo sotto il segmento (solo desktop, ruoli dal 2018): si accorcia se non c'è spazio */
+      var name = job.earlier ? "" : '<span class="cbar__name" aria-hidden="true">' + t(job.role) + "</span>";
       return '<li class="' + cls + '" data-panel="percorso" data-role="' + i + '" style="' + style + '">' +
-        '<span class="cbar__fill" aria-hidden="true"></span>' +
+        '<span class="cbar__fill" aria-hidden="true"></span>' + name +
         '<span class="cbar__label"><span class="cbar__role">' + t(job.role) + "</span>" +
         '<span class="cbar__meta">' + esc(job.company) + " · " + t(job.date) + "</span></span>" +
       "</li>";
@@ -492,8 +500,27 @@
     });
   }
 
+  /* Per ogni nome: il nome intero, altrimenti la prima abbreviazione che entra nel segmento.
+     Se non entra nemmeno la più corta, il CSS la tronca con i puntini. */
+  function fitCareerNames() {
+    Array.prototype.forEach.call(document.querySelectorAll(".cbar__name"), function (el) {
+      if (!el.clientWidth) { return; } /* nascosto: telefono e tablet */
+      var job = C.career[Number(el.parentNode.getAttribute("data-role"))];
+      var options = [job.role[lang]].concat(job.short ? job.short[lang] : []);
+      for (var k = 0; k < options.length; k++) {
+        el.textContent = options[k];
+        if (el.scrollWidth <= el.clientWidth) { return; }
+      }
+    });
+  }
+
   function bindCareerBar() {
     var bento = document.getElementById("bento");
+    var queued = 0;
+    new ResizeObserver(function () {
+      window.cancelAnimationFrame(queued);
+      queued = window.requestAnimationFrame(fitCareerNames);
+    }).observe(bento);
     bento.addEventListener("pointerover", function (event) {
       if (event.pointerType !== "mouse") { return; }
       var seg = event.target.closest(".cbar__seg");

@@ -16,10 +16,21 @@
 <body>
   <canvas class="field" id="field" aria-hidden="true"></canvas>
   <noscript>
-    <p class="noscript">Marco Bresciani · <a href="https://www.linkedin.com/in/brescianimarco/">LinkedIn</a> · <a href="https://github.com/MarcoBresciani-ai">GitHub</a></p>
+    <p class="noscript"><a href="https://www.linkedin.com/in/brescianimarco/">LinkedIn</a> · <a href="https://github.com/MarcoBresciani-ai">GitHub</a></p>
   </noscript>
-  <header class="hero" id="hero"></header>
-  <main class="bento" id="bento"></main>
+  <!-- Testi in chiaro per chi non ha JavaScript (e per i motori di ricerca): main.js li sostituisce -->
+  <header class="hero" id="hero">
+    <div class="hero__stage">
+      <h1 class="hero__static-name">Marco Bresciani</h1>
+      <p class="hero__tagline">Logistic Planner</p>
+    </div>
+  </header>
+  <main class="bento" id="bento">
+    <section class="tile tile--about">
+      <h2 class="tile__title">Chi sono</h2>
+      <p class="about__short">Logistic planner con una laurea in economia e marketing e la curiosità di chi vuole sempre capire come funzionano le cose. Dalla gestione dei trasporti alla strategia commerciale, fino all'intelligenza artificiale applicata al lavoro.</p>
+    </section>
+  </main>
 
   <dialog class="panel" id="panel" aria-labelledby="panelTitle">
     <div class="panel__head" id="panelHead">

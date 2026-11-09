@@ -38,6 +38,11 @@ window.CONTENT = {
       it: "Logistic planner con una laurea in economia e marketing e la curiosità di chi vuole sempre capire come funzionano le cose. Dalla gestione dei trasporti alla strategia commerciale, fino all'intelligenza artificiale applicata al lavoro.",
       en: "Logistics planner with a degree in Economics and Marketing and a habit of wanting to know how things really work. From moving freight to sales strategy, and now AI applied to work."
     },
+    /* Riga personale sotto la bio breve, nel riquadro */
+    personal: {
+      it: "Sportivo da sempre, oltre 22.000 minuti di musica all'anno su Spotify.",
+      en: "Into sport since I was a kid, over 22,000 minutes of music a year on Spotify."
+    },
     long: {
       it: [
         "Ho iniziato a lavorare durante l'università e non mi sono più fermato: dal casello autostradale alla grande distribuzione, dalla pianificazione dei trasporti alla guida di un ufficio commerciale. In due anni e mezzo sono passato dal coordinamento dei viaggi alla responsabilità commerciale; oggi pianifico spedizioni verso l'Italia e il resto del mondo e negozio con vettori su gomma e intermodale.",
@@ -60,11 +65,14 @@ window.CONTENT = {
   /* Dal più recente al più vecchio. current: true = ruolo attuale (pallino arancione, barra aperta).
      earlier: true = nel pannello sta sotto "Esperienze precedenti".
      start / end: date per la barra del tempo, "anno-mese" oppure solo "anno" (= gennaio).
-     Il ruolo attuale non ha end: la barra arriva a oggi. seasonal: true = segmento tratteggiato. */
+     Il ruolo attuale non ha end: la barra arriva a oggi. seasonal: true = segmento tratteggiato.
+     short: nomi abbreviati per la barra del tempo su desktop, dal più lungo al più corto;
+     si usa il primo che entra nel segmento (prima si prova il nome intero). */
   career: [
     {
       current: true,
       role: { it: "Logistic Planner", en: "Logistics Planner" },
+      short: { it: ["Log. Planner"], en: ["Log. Planner"] },
       company: "Gruppo Mauro Saviola Srl",
       date: { it: "Feb 2022 – oggi", en: "Feb 2022 – present" },
       start: "2022-02",
@@ -85,6 +93,7 @@ window.CONTENT = {
     },
     {
       role: { it: "Responsabile commerciale", en: "Sales Manager" },
+      short: { it: ["Resp. commerciale", "Resp. comm.", "Resp."], en: ["Sales Mgr", "Mgr"] },
       company: "Sogema Group Srl",
       date: { it: "Gen 2021 – Gen 2022", en: "Jan 2021 – Jan 2022" },
       start: "2021-01", end: "2022-01",
@@ -103,6 +112,7 @@ window.CONTENT = {
     },
     {
       role: { it: "Commerciale", en: "Sales Representative" },
+      short: { it: ["Comm.", "Com."], en: ["Sales Rep.", "Rep."] },
       company: "Sogema Group Srl",
       date: { it: "Mag 2020 – Gen 2021", en: "May 2020 – Jan 2021" },
       start: "2020-05", end: "2021-01",
@@ -113,6 +123,7 @@ window.CONTENT = {
     },
     {
       role: { it: "Disponente al traffico", en: "Transport Planner" },
+      short: { it: ["Disponente", "Disp."], en: ["Transp. Planner", "Planner"] },
       company: "Sogema Group Srl",
       date: { it: "Lug 2018 – Mag 2020", en: "Jul 2018 – May 2020" },
       start: "2018-07", end: "2020-05",
@@ -168,8 +179,10 @@ window.CONTENT = {
     { title: { it: "Diploma di Geometra", en: "Technical high school diploma in Surveying" }, school: "ITG Carlo D'Arco" }
   ],
 
+  /* tile: true = il gruppo compare anche nel riquadro, non solo nel pannello */
   skills: [
     {
+      tile: true,
       title: { it: "Professionali", en: "Professional" },
       items: {
         it: ["Pianificazione logistica", "Negoziazione con i fornitori", "Strategia commerciale", "Gestione e fidelizzazione clienti", "Coordinamento del team", "Reporting"],
@@ -191,6 +204,7 @@ window.CONTENT = {
       }
     },
     {
+      tile: true,
       title: { it: "AI", en: "AI" },
       items: {
         it: ["Claude", "Claude Code", "ChatGPT", "Midjourney (4 anni di esperienza)", "Higgsfield (video)"],

@@ -31,6 +31,7 @@
 
   --display: "Anton", "Arial Narrow", Impact, sans-serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tight: -0.015em; /* spaziatura dei titoli in Inter grassetto */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -145,6 +146,16 @@ a { color: inherit; }
   flex-direction: column;
   gap: clamp(18px, 3vw, 30px);
   padding-block: clamp(36px, 9vh, 96px) clamp(28px, 6vh, 56px);
+}
+
+/* Nome scritto nell'HTML: si vede solo senza JavaScript, poi arriva il tabellone */
+.hero__static-name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3rem, 10vw, 7rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .hero__sub {
@@ -296,17 +307,17 @@ a { color: inherit; }
 
 .tile:has(:focus-visible) { border-color: var(--accent); }
 
-/* Titoli piccoli e discreti: il contenuto del riquadro è la parte importante */
+/* Titoli piccoli e discreti: il contenuto del riquadro è la parte importante.
+   Anton solo per tabellone e numeri: tutti gli altri titoli in Inter grassetto, spaziatura un po' stretta. */
 .tile__title {
   min-height: 30px;
   display: flex;
   align-items: center;
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.75rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
   line-height: 1.2;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: var(--tight);
   color: var(--text-dim);
 }
 
@@ -389,6 +400,19 @@ a { color: inherit; }
   text-wrap: pretty;
 }
 
+.about__personal {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Competenze: i gruppi Professionali e AI */
+.skills__group .label { margin-bottom: 8px; }
+.skills__group + .skills__group { margin-top: 6px; }
+
 /* Numeri: riquadro arancione pieno, testo grafite */
 .tile--numbers {
   background: var(--accent);
@@ -450,7 +474,8 @@ a { color: inherit; }
    Telefono e tablet: verticale, il più recente in alto, ruolo e date accanto.
    Desktop: orizzontale da 2010 a oggi, ruolo e date al passaggio del mouse. */
 .cbar__readout,
-.cbar__axis { display: none; }
+.cbar__axis,
+.cbar__name { display: none; }
 
 .cbar__track {
   position: relative;
@@ -524,8 +549,9 @@ a { color: inherit; }
 
 .cbar__role {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
+  letter-spacing: var(--tight);
 }
 
 .cbar__meta {
@@ -550,6 +576,10 @@ a { color: inherit; }
 @keyframes grow-x {
   from { transform: scaleX(0); }
   to   { transform: none; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
 }
 
 /* Linea del tempo */
@@ -592,8 +622,9 @@ a { color: inherit; }
 
 .timeline__role {
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
+  letter-spacing: var(--tight);
 }
 
 .timeline__meta {
@@ -627,19 +658,30 @@ a { color: inherit; }
 
 .now__list { border-top: 1px solid var(--line); }
 
-.now__item,
+.now__item-title,
 .now__entry-title {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(1.625rem, 7vw, 2.25rem);
-  line-height: 1.1;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  letter-spacing: var(--tight);
   color: var(--text);
 }
 
 .now__item {
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
+}
+
+/* La descrizione sta su una riga: il testo intero è nel pannello */
+.now__item-text {
+  margin-top: 2px;
+  overflow: hidden;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* CV e Contatti */
@@ -725,12 +767,11 @@ a { color: inherit; }
 }
 
 .panel__title {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 2.25rem;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1.625rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
@@ -802,11 +843,10 @@ a { color: inherit; }
 .panel__subtitle {
   margin-bottom: 14px;
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.75rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
   line-height: 1.2;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: var(--tight);
   color: var(--text-dim);
 }
 
@@ -871,8 +911,9 @@ a { color: inherit; }
 
   .cbar__readout-role {
     font-size: 1.375rem;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.3;
+    letter-spacing: var(--tight);
   }
 
   .cbar__readout-meta {
@@ -883,6 +924,34 @@ a { color: inherit; }
   .cbar__track {
     display: block;
     height: 40px;
+    margin-bottom: 18px; /* spazio per i nomi sotto i segmenti */
+  }
+
+  /* Nome del ruolo sotto il segmento, largo quanto il segmento */
+  .cbar__name {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: calc(100% + 2px);
+    display: block;
+    overflow: hidden;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: opacity 200ms ease, color 200ms ease;
+  }
+
+  .cbar.has-active .cbar__seg:not(.is-active) .cbar__name { opacity: 0.4; }
+  .cbar__seg.is-active .cbar__name { color: var(--text); }
+
+  /* I nomi compaiono dopo il loro segmento */
+  .cbar.is-waiting .cbar__name { opacity: 0; }
+  .cbar.is-growing .cbar__name {
+    animation: fade-in 400ms ease backwards;
+    animation-delay: calc(var(--order) * 90ms + 300ms);
   }
 
   .cbar__track::before {
@@ -970,6 +1039,7 @@ a { color: inherit; }
 /* Riquadro Contatti stretto: l'email deve restare su una riga */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .tile--contact .linklist a { font-size: 0.8125rem; }
+  .cbar__name { font-size: 0.6875rem; letter-spacing: -0.01em; }
 }
 
 /* ---------- Animazioni ridotte ---------- */
@@ -979,5 +1049,5 @@ a { color: inherit; }
   .hero.is-intro .hero__tagline { animation: none; }
   .tile:hover { transform: none; box-shadow: none; }
   .tile:hover .tile__plus { transform: none; }
-  .cbar__fill { transition: none; }
+  .cbar__fill, .cbar__name { transition: none; }
 }
